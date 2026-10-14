@@ -1,0 +1,20 @@
+
+INSERT INTO transaction_logs (
+    transaction_id,
+    event_type,
+    event_details
+)
+SELECT
+    t.transaction_id,
+    'successful',
+    'Successful ' || t.transaction_type ||
+    ' transaction for amount ' || t.amount
+FROM transactions AS t
+WHERE t.status = 'successful'
+  AND NOT EXISTS (
+      SELECT 1
+      FROM transaction_logs AS l
+      WHERE l.transaction_id = t.transaction_id
+        AND l.event_type = 'successful'
+  )
+RETURNING log_id, transaction_id, event_type, event_details;
