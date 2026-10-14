@@ -1,0 +1,13 @@
+
+SELECT
+    l.log_id,
+    l.transaction_id,
+    t.transaction_type,
+    t.amount,
+    l.event_type,
+    l.event_details,
+    l.created_at
+FROM transaction_logs AS l
+JOIN transactions AS t
+    ON t.transaction_id = l.transaction_id
+ORDER BY l.log_id;
