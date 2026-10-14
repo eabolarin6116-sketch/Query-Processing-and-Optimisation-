@@ -1,0 +1,73 @@
+
+DO $$
+DECLARE
+    v_source_id BIGINT;
+    v_destination_id BIGINT;
+    v_transaction_id BIGINT;
+    v_rows INTEGER;
+BEGIN
+    -- Lock both accounts in a consistent order.
+    PERFORM account_id
+    FROM accounts
+    WHERE account_number IN ('FIN100001', 'FIN100002')
+    ORDER BY account_id
+    FOR UPDATE;
+
+    SELECT account_id INTO v_source_id
+    FROM accounts
+    WHERE account_number = 'FIN100001'
+      AND status = 'active';
+
+    SELECT account_id INTO v_destination_id
+    FROM accounts
+    WHERE account_number = 'FIN100002'
+      AND status = 'active';
+
+    IF v_source_id IS NULL OR v_destination_id IS NULL THEN
+        RAISE EXCEPTION 'Source or destination account is missing or inactive';
+    END IF;
+
+    IF v_source_id = v_destination_id THEN
+        RAISE EXCEPTION 'Source and destination must differ';
+    END IF;
+
+    UPDATE accounts
+    SET balance = balance - 10000.00
+    WHERE account_id = v_source_id
+      AND balance >= 10000.00;
+
+    GET DIAGNOSTICS v_rows = ROW_COUNT;
+
+    IF v_rows <> 1 THEN
+        RAISE EXCEPTION 'Insufficient funds in source account';
+    END IF;
+
+    UPDATE accounts
+    SET balance = balance + 10000.00
+    WHERE account_id = v_destination_id;
+
+    INSERT INTO transactions (
+        account_id,
+        transaction_type,
+        amount,
+        status
+    )
+    VALUES (
+        v_source_id,
+        'transfer',
+        10000.00,
+        'successful'
+    )
+    RETURNING transaction_id INTO v_transaction_id;
+
+    INSERT INTO transfers (
+        transaction_id,
+        source_account_id,
+        destination_account_id
+    )
+    VALUES (
+        v_transaction_id,
+        v_source_id,
+        v_destination_id
+    );
+END $$;
