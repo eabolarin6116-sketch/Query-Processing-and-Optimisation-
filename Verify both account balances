@@ -1,0 +1,5 @@
+
+SELECT account_number, balance
+FROM accounts
+WHERE account_number IN ('FIN100001', 'FIN100002')
+ORDER BY account_number;
