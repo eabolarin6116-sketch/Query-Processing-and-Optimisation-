@@ -1,0 +1,20 @@
+
+SELECT
+    t.transaction_id,
+    t.transaction_type,
+    t.amount,
+    t.status,
+    src.account_number AS source_account,
+    dst.account_number AS destination_account,
+    tr.created_at
+FROM transfers AS tr
+JOIN transactions AS t
+    ON t.transaction_id = tr.transaction_id
+JOIN accounts AS src
+    ON src.account_id = tr.source_account_id
+JOIN accounts AS dst
+    ON dst.account_id = tr.destination_account_id
+WHERE src.account_number = 'FIN100001'
+  AND dst.account_number = 'FIN100002'
+ORDER BY tr.transfer_id DESC
+LIMIT 1;
