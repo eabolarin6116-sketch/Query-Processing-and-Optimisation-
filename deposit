@@ -1,0 +1,18 @@
+
+INSERT INTO transactions (
+    account_id,
+    transaction_type,
+    amount,
+    status
+)
+SELECT
+    a.account_id,
+    'deposit',
+    20000.00,
+    'successful'
+FROM accounts AS a
+JOIN customers AS c
+    ON c.customer_id = a.customer_id
+WHERE c.email = 'ada.okafor@example.com'
+  AND a.account_number = 'FIN100001'
+RETURNING transaction_id, account_id, transaction_type, amount, status;
