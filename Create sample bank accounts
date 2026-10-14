@@ -1,0 +1,33 @@
+
+INSERT INTO accounts (
+    customer_id,
+    account_number,
+    account_type,
+    balance
+)
+VALUES
+    (
+        (SELECT customer_id
+         FROM customers
+         WHERE email = 'ada.okafor@example.com'),
+        'FIN100001',
+        'savings',
+        100000.00
+    ),
+    (
+        (SELECT customer_id
+         FROM customers
+         WHERE email = 'tunde.bello@example.com'),
+        'FIN100002',
+        'current',
+        100000.00
+    ),
+    (
+        (SELECT customer_id
+         FROM customers
+         WHERE email = 'mina.james@example.com'),
+        'FIN100003',
+        'savings',
+        100000.00
+    )
+RETURNING account_id, customer_id, account_number, account_type, balance;
