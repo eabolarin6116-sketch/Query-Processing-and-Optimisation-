@@ -1,0 +1,8 @@
+SELECT
+    c.first_name,
+    a.account_number,
+    a.balance
+FROM customers AS c
+JOIN accounts AS a
+    ON a.customer_id = c.customer_id
+WHERE c.email = 'ada.okafor@example.com';
