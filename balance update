@@ -1,0 +1,18 @@
+
+BEGIN;
+
+UPDATE accounts AS a
+SET balance = a.balance + 20000.00
+WHERE a.account_number = 'FIN100001'
+  AND a.balance = 100000.00
+  AND EXISTS (
+      SELECT 1
+      FROM transactions AS t
+      WHERE t.account_id = a.account_id
+        AND t.transaction_type = 'deposit'
+        AND t.amount = 20000.00
+        AND t.status = 'successful'
+  )
+RETURNING account_number, balance;
+
+COMMIT;
